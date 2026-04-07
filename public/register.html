@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - WriteSpace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/app.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <nav id="main-nav" class="bg-white border-b border-gray-200 px-4 py-3"></nav>
+
+    <main class="flex-1 flex items-center justify-center px-4 py-12">
+        <div class="w-full max-w-md">
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <div class="text-center mb-8">
+                    <h1 class="text-2xl font-bold text-gray-900">Create an Account</h1>
+                    <p class="mt-2 text-sm text-gray-500">Join WriteSpace and start sharing your stories</p>
+                </div>
+
+                <div id="error-message" class="hidden mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm"></div>
+
+                <form id="register-form" class="space-y-5">
+                    <div>
+                        <label for="display_name" class="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
+                        <input
+                            type="text"
+                            id="display_name"
+                            name="display_name"
+                            required
+                            minlength="1"
+                            maxlength="100"
+                            placeholder="Your display name"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                        />
+                    </div>
+
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            required
+                            minlength="3"
+                            maxlength="50"
+                            pattern="[a-zA-Z0-9_]+"
+                            placeholder="Choose a username"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                        />
+                        <p class="mt-1 text-xs text-gray-400">3-50 characters, letters, numbers, and underscores only</p>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            required
+                            minlength="8"
+                            maxlength="72"
+                            placeholder="Create a password"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                        />
+                        <p class="mt-1 text-xs text-gray-400">8-72 characters, no spaces</p>
+                    </div>
+
+                    <button
+                        type="submit"
+                        id="submit-btn"
+                        class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Create Account
+                    </button>
+                </form>
+
+                <p class="mt-6 text-center text-sm text-gray-500">
+                    Already have an account?
+                    <a href="/login.html" class="font-medium text-indigo-600 hover:text-indigo-500 transition">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            "use strict";
+
+            if (App.isLoggedIn()) {
+                window.location.href = "/blogs.html";
+                return;
+            }
+
+            App.renderNav("register");
+
+            var form = document.getElementById("register-form");
+            var errorMessage = document.getElementById("error-message");
+            var submitBtn = document.getElementById("submit-btn");
+            var displayNameInput = document.getElementById("display_name");
+            var usernameInput = document.getElementById("username");
+            var passwordInput = document.getElementById("password");
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorMessage.classList.remove("hidden");
+            }
+
+            function hideError() {
+                errorMessage.classList.add("hidden");
+                errorMessage.textContent = "";
+            }
+
+            function setLoading(loading) {
+                submitBtn.disabled = loading;
+                submitBtn.textContent = loading ? "Creating Account..." : "Create Account";
+            }
+
+            function validateForm() {
+                var displayName = displayNameInput.value.trim();
+                var username = usernameInput.value.trim();
+                var password = passwordInput.value;
+
+                if (!displayName) {
+                    showError("Display name is required.");
+                    displayNameInput.focus();
+                    return null;
+                }
+
+                if (displayName.length > 100) {
+                    showError("Display name must be at most 100 characters.");
+                    displayNameInput.focus();
+                    return null;
+                }
+
+                if (!username) {
+                    showError("Username is required.");
+                    usernameInput.focus();
+                    return null;
+                }
+
+                if (username.length < 3 || username.length > 50) {
+                    showError("Username must be between 3 and 50 characters.");
+                    usernameInput.focus();
+                    return null;
+                }
+
+                if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                    showError("Username must contain only letters, numbers, and underscores.");
+                    usernameInput.focus();
+                    return null;
+                }
+
+                if (!password) {
+                    showError("Password is required.");
+                    passwordInput.focus();
+                    return null;
+                }
+
+                if (password.length < 8 || password.length > 72) {
+                    showError("Password must be between 8 and 72 characters.");
+                    passwordInput.focus();
+                    return null;
+                }
+
+                if (/\s/.test(password)) {
+                    showError("Password must not contain spaces.");
+                    passwordInput.focus();
+                    return null;
+                }
+
+                return {
+                    display_name: displayName,
+                    username: username,
+                    password: password,
+                };
+            }
+
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                hideError();
+
+                var payload = validateForm();
+                if (!payload) return;
+
+                setLoading(true);
+
+                App.apiFetch("/api/auth/register", {
+                    method: "POST",
+                    body: payload,
+                })
+                    .then(function (result) {
+                        if (result.data && result.data.token) {
+                            App.setToken(result.data.token);
+                            App.showToast("Account created successfully!", "success");
+                            window.location.href = "/blogs.html";
+                        } else {
+                            showError("Unexpected response from server. Please try again.");
+                            setLoading(false);
+                        }
+                    })
+                    .catch(function (err) {
+                        var message = (err && err.error) ? err.error : "Registration failed. Please try again.";
+                        showError(message);
+                        setLoading(false);
+                    });
+            });
+        })();
+    </script>
+</body>
+</html>

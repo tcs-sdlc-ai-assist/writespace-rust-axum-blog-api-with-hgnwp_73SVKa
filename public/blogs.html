@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blogs | WriteSpace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+            animation: spin 0.8s linear infinite;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            height: 64px;
+        }
+        .nav-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #6366f1;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .nav-link {
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            transition: color 0.15s, background 0.15s;
+        }
+        .nav-link:hover {
+            color: #6366f1;
+            background: #eef2ff;
+        }
+        .nav-link.active {
+            color: #6366f1;
+            background: #eef2ff;
+        }
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .nav-user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+        .nav-user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        .nav-logout-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #9ca3af;
+            padding: 0.25rem;
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.15s, background 0.15s;
+        }
+        .nav-logout-btn:hover {
+            color: #ef4444;
+            background: #fef2f2;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <nav id="main-nav" class="bg-white border-b border-gray-200 sticky top-0 z-50"></nav>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">All Blog Posts</h1>
+                <p class="mt-1 text-sm text-gray-500">Browse and manage your blog posts</p>
+            </div>
+            <a href="/new-post.html"
+               class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg shadow-sm transition-colors text-sm">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                New Post
+            </a>
+        </div>
+
+        <div id="posts-container">
+            <div class="flex justify-center items-center py-16">
+                <div class="w-8 h-8 border-3 border-gray-200 border-t-primary-500 rounded-full animate-spin" style="border-width:3px;border-top-color:#6366f1;"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        (function () {
+            "use strict";
+
+            if (!App.requireAuth()) {
+                return;
+            }
+
+            App.renderNav("blogs");
+
+            var container = document.getElementById("posts-container");
+
+            function truncateContent(text, maxLen) {
+                if (!text) return "";
+                var stripped = text.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+                if (stripped.length <= maxLen) return stripped;
+                return stripped.substring(0, maxLen).trim() + "…";
+            }
+
+            function renderPosts(posts) {
+                if (!posts || posts.length === 0) {
+                    container.innerHTML =
+                        '<div class="text-center py-16">' +
+                            '<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-50 mb-4">' +
+                                '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+                                    '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
+                                    '<polyline points="14 2 14 8 20 8"/>' +
+                                    '<line x1="16" y1="13" x2="8" y2="13"/>' +
+                                    '<line x1="16" y1="17" x2="8" y2="17"/>' +
+                                    '<polyline points="10 9 9 9 8 9"/>' +
+                                '</svg>' +
+                            '</div>' +
+                            '<h3 class="text-lg font-semibold text-gray-900 mb-1">No posts yet</h3>' +
+                            '<p class="text-gray-500 mb-6">Be the first to create a blog post!</p>' +
+                            '<a href="/new-post.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg shadow-sm transition-colors text-sm">' +
+                                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+                                'Create Your First Post' +
+                            '</a>' +
+                        '</div>';
+                    return;
+                }
+
+                var html = '<div class="space-y-4">';
+
+                for (var i = 0; i < posts.length; i++) {
+                    var post = posts[i];
+                    var authorName = post.author ? post.author.display_name : "Unknown";
+                    var authorRole = post.author ? post.author.role : "user";
+                    var dateStr = App.formatDate(post.created_at);
+                    var excerpt = truncateContent(post.content || post.title, 160);
+
+                    html += '<a href="/post.html?id=' + App.escapeHtml(post.id) + '" class="block bg-white rounded-xl border border-gray-200 hover:border-primary-300 hover:shadow-md transition-all duration-200 overflow-hidden group">';
+                    html += '<div class="p-5 sm:p-6">';
+
+                    html += '<div class="flex items-start justify-between gap-4">';
+                    html += '<h2 class="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2">' + App.escapeHtml(post.title) + '</h2>';
+                    html += '</div>';
+
+                    if (excerpt) {
+                        html += '<p class="mt-2 text-sm text-gray-600 line-clamp-2">' + App.escapeHtml(excerpt) + '</p>';
+                    }
+
+                    html += '<div class="mt-4 flex items-center gap-3">';
+                    html += App.renderAvatar(authorName, authorRole, 28);
+                    html += '<div class="flex items-center gap-2 flex-wrap">';
+                    html += '<span class="text-sm font-medium text-gray-700">' + App.escapeHtml(authorName) + '</span>';
+                    html += App.getRoleBadge(authorRole);
+                    html += '<span class="text-xs text-gray-400">·</span>';
+                    html += '<span class="text-xs text-gray-500">' + App.escapeHtml(dateStr) + '</span>';
+                    html += '</div>';
+                    html += '</div>';
+
+                    html += '</div>';
+                    html += '</a>';
+                }
+
+                html += '</div>';
+                container.innerHTML = html;
+            }
+
+            function loadPosts() {
+                App.apiFetch("/api/posts", { method: "GET" })
+                    .then(function (result) {
+                        renderPosts(result.data);
+                    })
+                    .catch(function (err) {
+                        if (err && err.status === 401) {
+                            return;
+                        }
+                        container.innerHTML =
+                            '<div class="text-center py-16">' +
+                                '<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 mb-4">' +
+                                    '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+                                        '<circle cx="12" cy="12" r="10"/>' +
+                                        '<line x1="12" y1="8" x2="12" y2="12"/>' +
+                                        '<line x1="12" y1="16" x2="12.01" y2="16"/>' +
+                                    '</svg>' +
+                                '</div>' +
+                                '<h3 class="text-lg font-semibold text-gray-900 mb-1">Failed to load posts</h3>' +
+                                '<p class="text-gray-500 mb-6">' + App.escapeHtml((err && err.error) || "An unexpected error occurred.") + '</p>' +
+                                '<button onclick="window.location.reload()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors text-sm">' +
+                                    'Try Again' +
+                                '</button>' +
+                            '</div>';
+                    });
+            }
+
+            loadPosts();
+        })();
+    </script>
+</body>
+</html>
